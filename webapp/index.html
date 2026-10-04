@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>MyLifeStyle</title>
+<link rel="stylesheet" href="/app/css/style.css" />
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<div id="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="header__title">MyLifeStyle</div>
+    <div class="header__subtitle" id="headerSubtitle">Загрузка…</div>
+  </header>
+
+  <!-- Navigation tabs -->
+  <nav class="tabs">
+    <button class="tab active" data-route="dashboard">🏠 Главная</button>
+    <button class="tab" data-route="add">➕ Добавить</button>
+    <button class="tab" data-route="stats">📊 Отчёт</button>
+    <button class="tab" data-route="budget">🎯 Бюджет</button>
+    <button class="tab" data-route="categories">📁 Категории</button>
+  </nav>
+
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+      <div class="balance-card">
+        <div class="balance-card__label">Баланс за месяц</div>
+        <div class="balance-card__amount" id="balanceAmount">—</div>
+        <div class="balance-card__row">
+          <div><span class="dot green"></span> Доход <b id="incomeTotal">—</b></div>
+          <div><span class="dot red"></span> Расход <b id="expenseTotal">—</b></div>
+        </div>
+        <div class="period-switch">
+          <button class="period-btn active" data-period="week">7 дней</button>
+          <button class="period-btn" data-period="month">Месяц</button>
+          <button class="period-btn" data-period="prevmonth">Прошлый</button>
+        </div>
+      </div>
+
+      <h3>Последние операции</h3>
+      <div id="recentList" class="tx-list"><div class="empty">Загрузка…</div></div>
+    </section>
+
+    <!-- ADD -->
+    <section class="page" id="page-add">
+      <h3>Новая операция</h3>
+      <div class="type-switch">
+        <button class="type-btn active" data-type="expense">💸 Расход</button>
+        <button class="type-btn" data-type="income">💰 Доход</button>
+      </div>
+
+      <label class="field">
+        <span>Сумма</span>
+        <input type="number" id="addAmount" placeholder="0" step="0.01" inputmode="decimal" />
+      </label>
+
+      <label class="field">
+        <span>Категория</span>
+        <div class="cat-grid" id="catGrid"></div>
+      </label>
+
+      <label class="field">
+        <span>Дата</span>
+        <input type="date" id="addDate" />
+      </label>
+
+      <label class="field">
+        <span>Комментарий</span>
+        <input type="text" id="addComment" placeholder="Необязательно" maxlength="200" />
+      </label>
+
+      <button class="primary-btn" id="saveTxBtn">💾 Сохранить</button>
+
+      <div class="voice-hint">
+        <button class="secondary-btn" id="voiceBtn">🎤 Голосовой ввод</button>
+        <div id="voiceStatus"></div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="page" id="page-stats">
+      <h3>Аналитика</h3>
+      <div class="period-switch">
+        <button class="period-btn active" data-stats-period="week">7 дней</button>
+        <button class="period-btn" data-stats-period="month">Месяц</button>
+        <button class="period-btn" data-stats-period="prevmonth">Прошлый</button>
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-box income">
+          <div class="summary-label">Доход</div>
+          <div class="summary-value" id="stIncome">—</div>
+          <div class="summary-delta" id="stIncomeDelta"></div>
+        </div>
+        <div class="summary-box expense">
+          <div class="summary-label">Расход</div>
+          <div class="summary-value" id="stExpense">—</div>
+          <div class="summary-delta" id="stExpenseDelta"></div>
+        </div>
+      </div>
+
+      <h4>Структура расходов</h4>
+      <div class="chart-container">
+        <canvas id="pieChart" width="320" height="240"></canvas>
+      </div>
+      <div id="pieLegend" class="legend"></div>
+
+      <h4>Динамика по дням</h4>
+      <div class="chart-container">
+        <canvas id="lineChart" width="320" height="200"></canvas>
+      </div>
+
+      <h4>Сравнение с прошлым периодом</h4>
+      <div id="compareBox" class="compare"></div>
+    </section>
+
+    <!-- BUDGET -->
+    <section class="page" id="page-budget">
+      <h3>Бюджет по категориям</h3>
+      <div id="budgetList"></div>
+      <button class="secondary-btn" id="addBudgetBtn">➕ Установить лимит</button>
+
+      <div id="budgetModal" class="modal hidden">
+        <div class="modal__content">
+          <h4>Установить лимит</h4>
+          <label class="field">
+            <span>Категория</span>
+            <select id="budgetCat"></select>
+          </label>
+          <label class="field">
+            <span>Сумма в месяц</span>
+            <input type="number" id="budgetLimit" placeholder="0" step="0.01" />
+          </label>
+          <div class="modal__actions">
+            <button class="secondary-btn" id="budgetCancel">Отмена</button>
+            <button class="primary-btn" id="budgetSave">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="page" id="page-categories">
+      <h3>Категории</h3>
+      <div class="type-switch">
+        <button class="type-btn active" data-cat-type="expense">💸 Расходы</button>
+        <button class="type-btn" data-cat-type="income">💰 Доходы</button>
+      </div>
+      <div id="catList" class="cat-list"></div>
+      <div class="add-cat-row">
+        <input type="text" id="newCatName" placeholder="Новая категория..." maxlength="30" />
+        <button class="primary-btn small" id="addCatBtn">Добавить</button>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<script src="/app/js/api.js"></script>
+<script src="/app/js/charts.js"></script>
+<script src="/app/js/app.js"></script>
+</body>
+</html>
